@@ -3,6 +3,7 @@ const app = express()
 const morgan = require('morgan')
 const { client } = require('./client')
 const axios = require('axios')
+const { basePath, baseRouter } = require('./helper/routeHandler')
 const { connectDb } = require('./helper/connection')
 connectDb()
 
@@ -19,7 +20,7 @@ connectDb()
 //         res.send(e)
 //     }
 // });
-
+app.use(basePath, baseRouter);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

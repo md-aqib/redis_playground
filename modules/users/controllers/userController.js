@@ -37,7 +37,36 @@ const register = async (req, res) => {
 
 const login = async (req, res) =>  { 
     try {
-
+        const { email, passowrd } = req.body;
+        if(!email || !passowrd) {
+            return res.json({
+                meta: { msg: "Missing Parameter", status: false }
+            })
+        };
+        const findUser = await userModel.findOne({ email });
+        if(!findUser) {
+            return res.json({
+                meta: { msg: "Invalid email", status: false }
+            })
+        };
+        let matchPass = bcrypt.compare(passowrd, hash);
+        if(!matchPass) {
+            return res.json({
+                meta: { msg: "Invalid password", status: false }
+            })
+        };
+        let token = jwt.sign(
+            {
+                userId: findUser.userId,
+                email
+            },
+            'secret',
+            { expiresIn: '1h' }
+        );
+        return res.json({
+            meta: { msg: "logIn Successfully", status: true },
+            token
+        })
     } catch(e) {
         return res.json({
             meta: { msg: e.message, status: false }
@@ -47,5 +76,6 @@ const login = async (req, res) =>  {
 
 
 module.exports = {
-    register
+    register,
+    login
 };
