@@ -35,6 +35,16 @@ const register = async (req, res) => {
     }
 }
 
+const login = async (req, res) =>  { 
+    try {
+
+    } catch(e) {
+        return res.json({
+            meta: { msg: e.message, status: false }
+        })
+    }
+}
+
 
 module.exports = {
     register

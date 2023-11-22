@@ -2,10 +2,7 @@ const { connect, connection } = require('mongoose')
 
 const connectDb = async () => {
     try {
-        connect('mongodb://127.0.0.1:27017/todo-app', {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        connect('mongodb://127.0.0.1:27017/todo-app');
 
         // Check if the connection is successful
         const db = connection;
