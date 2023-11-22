@@ -36,4 +36,6 @@ const register = async (req, res) => {
 }
 
 
-module.exports = { userModel };
+module.exports = {
+    register
+};
