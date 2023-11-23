@@ -1,6 +1,7 @@
 const { userModel } = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const jwt = require('jsonwebtoken')
 
 const register = async (req, res) => {
     try {
@@ -10,7 +11,7 @@ const register = async (req, res) => {
             email,
             mobile
         } = req.body;
-        if(!name || !passowrd || !email || !mobile) {
+        if(!name || !password || !email || !mobile) {
             return res.json({
                 meta: { msg: "Missing Parameter", status: false }
             })
@@ -37,8 +38,8 @@ const register = async (req, res) => {
 
 const login = async (req, res) =>  { 
     try {
-        const { email, passowrd } = req.body;
-        if(!email || !passowrd) {
+        const { email, password } = req.body;
+        if(!email || !password) {
             return res.json({
                 meta: { msg: "Missing Parameter", status: false }
             })
@@ -49,7 +50,7 @@ const login = async (req, res) =>  {
                 meta: { msg: "Invalid email", status: false }
             })
         };
-        let matchPass = bcrypt.compare(passowrd, hash);
+        let matchPass = bcrypt.compare(password, findUser.password);
         if(!matchPass) {
             return res.json({
                 meta: { msg: "Invalid password", status: false }
