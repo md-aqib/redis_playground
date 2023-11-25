@@ -3,13 +3,17 @@ const { client } = require('../../../client')
 
 const cacheMiddleware = async (req, res, next) => {
     try {
-        const key = req.originalUrl;
+        const { page  } = req.body;
+        const key = `${req.originalUrl}:${page}`;
+        console.log(key)
         const data = await client.get(key)
         if (data) {
-            console.log('Data retrieved from cache');
-            req.cachedData = JSON.parse(data);
+            console.log('Data retrieved from cache', key);
             req.cached = true;
-            next();
+            return res.json({
+                meta: { msg: "List found successfully", status: true },
+                ...JSON.parse(data),
+            });
         } else {
             console.log('Data not found in cache');
             req.cached = false;

@@ -29,8 +29,9 @@ const updateTodo = async (req, res) => {
         };
         const saveData = await new todoModel(req.body).save();
         /* delete cached data */
-        let key = "/todolist";
-        client.del(key)
+        let key = "/todoapp/user/todo/todolist:*";
+        let keys = await client.keys(key);
+        await client.del(keys)
         /* delete cached data */
         return res.json({
             meta: { msg: "Todo saved successfully", status: true },
@@ -45,37 +46,41 @@ const updateTodo = async (req, res) => {
 
 const todoList = async (req, res) => {
     try {
-        const { page, resPerPage, status } = req.query;
-        // if(!page || !resPerPage) {
-        //     return res.json({
-        //         meta: { msg: "Missing Parameter", status: false }
-        //     })
-        // };
+        const { page, resPerPage, status } = req.body;
+        if(!page || !resPerPage) {
+            return res.json({
+                meta: { msg: "Missing Parameter", status: false }
+            })
+        };
         let query = {
             ...status && { status }
         }
         const list = await todoModel.find(query)
             .sort({ createdAt: -1 })
-            // .limit(+resPerPage)
-            // .skip((+resPerPage * +page) - +resPerPage);
+            .limit(+resPerPage)
+            .skip((+resPerPage * +page) - +resPerPage);
         if(!list.length) {
             return res.json({
                 meta: { msg: "Data not found", status: false },
             });
         };
+        const count = await todoModel.countDocuments(query);
 
         if(!req.cached) {
-            const key = req.originalUrl;
-            await client.set(key, JSON.stringify(list));
-            await client.expire('todos', 10) //in secs
+            const key = `${req.originalUrl}:${page}`;
+            await client.set(key, JSON.stringify({
+                data: list,
+                count,
+                totalPages: Math.ceil(count / +resPerPage)
+            }));
+            await client.expire(key, '1000') //in secs
         };
 
-        const count = await todoModel.countDocuments(query);
         return res.json({
-            meta: { msg: "Todo saved successfully", status: true },
+            meta: { msg: "List found successfully", status: true },
             data: list,
             count,
-            // totalPages: Math.ceil(count / +resPerPage)
+            totalPages: Math.ceil(count / +resPerPage)
         })
     } catch(e) {
         return res.json({
