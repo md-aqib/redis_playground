@@ -1,11 +1,12 @@
 const express = require('express');
 const app = express()
-const morgan = require('morgan')
+const logger = require('morgan')
 const { client } = require('./client')
 //const axios = require('axios')
 const { basePath, baseRouter } = require('./helper/routeHandler')
 const { connectDb } = require('./helper/connection')
 connectDb()
+app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // app.get('/', async (req, res) => {

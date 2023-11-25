@@ -8,7 +8,7 @@ const {
 } = require('../controllers/todoController')
 
 todoRoutes.post('/updatetodo', verifyToken, updateTodo);
-todoRoutes.post('/todolist', verifyToken, cacheMiddleware, todoList);
-todoRoutes.post('/tododetails', verifyToken, todoDetails);
+todoRoutes.get('/todolist', verifyToken, cacheMiddleware, todoList);
+todoRoutes.get('/tododetails', verifyToken, todoDetails);
 
 module.exports = todoRoutes;

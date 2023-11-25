@@ -62,7 +62,7 @@ const login = async (req, res) =>  {
                 email
             },
             'mysecretkey',
-            { expiresIn: '1h', algorithm: 'RS256' }
+            { expiresIn: '1h' }
         );
         const loginUser = await userModel.findOneAndUpdate({ email }, { isLogin: true }, { new: true })
         return res.json({

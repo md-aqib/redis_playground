@@ -10,6 +10,12 @@ const updateTodo = async (req, res) => {
                 meta: { msg: "Missing Parameter", status: false }
             })
         };
+        const findTodo = await todoModel.findOne({ todo });
+        if(!todoId && findTodo) {
+            return res.json({
+                meta: { msg: "Todo already exists", status: false }
+            })
+        };
         if(todoId) {
             const updateData = await todoModel.findOneAndUpdate(
                 { todoId: Types.ObjectId(todoId) },
@@ -23,7 +29,7 @@ const updateTodo = async (req, res) => {
         };
         const saveData = await new todoModel(req.body).save();
         /* delete cached data */
-        let key = "/updatetodo";
+        let key = "/todolist";
         client.del(key)
         /* delete cached data */
         return res.json({
@@ -40,11 +46,11 @@ const updateTodo = async (req, res) => {
 const todoList = async (req, res) => {
     try {
         const { page, resPerPage, status } = req.query;
-        if(!page || !resPerPage) {
-            return res.json({
-                meta: { msg: "Missing Parameter", status: false }
-            })
-        };
+        // if(!page || !resPerPage) {
+        //     return res.json({
+        //         meta: { msg: "Missing Parameter", status: false }
+        //     })
+        // };
         let query = {
             ...status && { status }
         }
@@ -60,7 +66,7 @@ const todoList = async (req, res) => {
 
         if(!req.cached) {
             const key = req.originalUrl;
-            await client.set(key, JSON.stringify(data));
+            await client.set(key, JSON.stringify(list));
             await client.expire('todos', 10) //in secs
         };
 
