@@ -61,11 +61,13 @@ const login = async (req, res) =>  {
                 userId: findUser.userId,
                 email
             },
-            'secret',
-            { expiresIn: '1h' }
+            'mysecretkey',
+            { expiresIn: '1h', algorithm: 'RS256' }
         );
+        const loginUser = await userModel.findOneAndUpdate({ email }, { isLogin: true }, { new: true })
         return res.json({
             meta: { msg: "logIn Successfully", status: true },
+            data: loginUser,
             token
         })
     } catch(e) {

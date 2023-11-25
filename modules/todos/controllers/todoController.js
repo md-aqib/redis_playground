@@ -1,5 +1,6 @@
 const { Types } = require('mongoose')
 const { todoModel } = require('../models/todoModel');
+const { client } = require('../../../client')
 
 const updateTodo = async (req, res) => {
     try {
@@ -21,6 +22,10 @@ const updateTodo = async (req, res) => {
             })
         };
         const saveData = await new todoModel(req.body).save();
+        /* delete cached data */
+        let key = "/updatetodo";
+        client.del(key)
+        /* delete cached data */
         return res.json({
             meta: { msg: "Todo saved successfully", status: true },
             data: saveData
@@ -45,19 +50,26 @@ const todoList = async (req, res) => {
         }
         const list = await todoModel.find(query)
             .sort({ createdAt: -1 })
-            .limit(+resPerPage)
-            .skip((+resPerPage * +page) - +resPerPage);
+            // .limit(+resPerPage)
+            // .skip((+resPerPage * +page) - +resPerPage);
         if(!list.length) {
             return res.json({
                 meta: { msg: "Data not found", status: false },
             });
         };
+
+        if(!req.cached) {
+            const key = req.originalUrl;
+            await client.set(key, JSON.stringify(data));
+            await client.expire('todos', 10) //in secs
+        }
+
         const count = await todoModel.countDocuments(query);
         return res.json({
             meta: { msg: "Todo saved successfully", status: true },
             data: list,
             count,
-            totalPages: Math.ceil(count / +resPerPage)
+            // totalPages: Math.ceil(count / +resPerPage)
         })
     } catch(e) {
         return res.json({
