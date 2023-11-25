@@ -62,7 +62,7 @@ const todoList = async (req, res) => {
             const key = req.originalUrl;
             await client.set(key, JSON.stringify(data));
             await client.expire('todos', 10) //in secs
-        }
+        };
 
         const count = await todoModel.countDocuments(query);
         return res.json({
