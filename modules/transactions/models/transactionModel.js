@@ -5,7 +5,8 @@ const transactionSchema = new Schema({
     name: String,
     email: String,
     currentBal: Number,
-    type: { type: String, enum: ["WALLET-TRANSFER"], default: "" },
+    type: String,
+    status: { type: String, enum: ["Pending", "Failed", "Success"], default: "Pending" },
     createdAt: Number,
     updatedAt: Number
 }, { timestamps: true });

@@ -16,6 +16,12 @@ const register = async (req, res) => {
                 meta: { msg: "Missing Parameter", status: false }
             })
         };
+        const findExistingUser = await userModel.findOne({ email });
+        if(findExistingUser) {
+            return res.json({
+                meta: { msg: "User already exists", status: false }
+            })
+        };
         let salt = await bcrypt.genSalt(saltRounds)
         let hash = await bcrypt.hash(password, salt);
         const saveObj = {

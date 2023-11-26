@@ -5,6 +5,7 @@ const { client } = require('../../../client')
 const updateTodo = async (req, res) => {
     try {
         const { todo, todoId } = req.body;
+        const { userId } = req.decoded; 
         if(!todo) {
             return res.json({
                 meta: { msg: "Missing Parameter", status: false }
@@ -27,7 +28,11 @@ const updateTodo = async (req, res) => {
                 data: updateData
             })
         };
-        const saveData = await new todoModel(req.body).save();
+        let saveObj = {
+            todo,
+            userId
+        }
+        const saveData = await new todoModel(saveObj).save();
         /* delete cached data */
         let key = "/todoapp/user/todo/todolist:*";
         let keys = await client.keys(key);

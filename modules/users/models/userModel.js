@@ -8,7 +8,7 @@ const userSchema = new Schema({
     profilePic: String,
     mobile: String,
     isLogin: { type: Boolean, default: false },
-    walletBal: Number,
+    walletBal: { type: Number, default: 0 },
     createdAt: Number,
     updatedAt: Number
 }, { timestamps: true });
